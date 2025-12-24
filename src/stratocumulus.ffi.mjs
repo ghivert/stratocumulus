@@ -10,11 +10,11 @@ export function create(url, protocols) {
   try {
     protocols = protocols.toArray()
     const ws = new WebSocket(url, protocols)
-    return new $gleam.Ok(ws)
+    return $gleam.Result$Ok(ws)
   } catch (error) {
     if (error instanceof SyntaxError) {
-      const err = new $stratocumulus.OpenSyntaxError()
-      return new $gleam.Error(err)
+      const err = $stratocumulus.OpenError$OpenSyntaxError()
+      return $gleam.Result$Error(err)
     }
   }
 }
@@ -22,10 +22,10 @@ export function create(url, protocols) {
 // prettier-ignore
 export function readyState(ws) {
   switch (ws.readyState) {
-    case WebSocket.CONNECTING: return new $stratocumulus.Connecting()
-    case WebSocket.OPEN: return new $stratocumulus.Open()
-    case WebSocket.CLOSING: return new $stratocumulus.Closing()
-    case WebSocket.CLOSED: return new $stratocumulus.Closed()
+    case WebSocket.CONNECTING: return $stratocumulus.ReadyState$Connecting()
+    case WebSocket.OPEN: return $stratocumulus.ReadyState$Open()
+    case WebSocket.CLOSING: return $stratocumulus.ReadyState$Closing()
+    case WebSocket.CLOSED: return $stratocumulus.ReadyState$Closed()
   }
 }
 
@@ -33,11 +33,11 @@ export function send(ws, content) {
   try {
     const data = content.rawBuffer !== undefined ? content.rawBuffer : content
     ws.send(data)
-    return new $gleam.Ok(ws)
+    return $gleam.Result$Ok(ws)
   } catch (error) {
     if (error instanceof InvalidStateError) {
-      const err = new $stratocumulus.InvalidStateError()
-      return new $gleam.Error(err)
+      const err = $stratocumulus.SendError$InvalidStateError()
+      return $gleam.Result$Error(err)
     }
   }
 }
@@ -68,14 +68,14 @@ export function addEventListener(ws, event, handler) {
 export function close(ws, code, reason) {
   try {
     ws.close(code, reason)
-    return new $gleam.Ok()
+    return $gleam.Result$Ok()
   } catch (error) {
     if (error instanceof InvalidAccessError) {
-      const err = new $stratocumulus.InvalidAccessError()
-      return new $gleam.Error(err)
+      const err = $stratocumulus.CloseError$InvalidAccessError()
+      return $gleam.Result$Error(err)
     } else if (error instanceof SyntaxError) {
-      const err = new $stratocumulus.ReasonSyntaxError()
-      return new $gleam.Error(err)
+      const err = $stratocumulus.CloseError$ReasonSyntaxError()
+      return $gleam.Result$Error(err)
     }
   }
 }
